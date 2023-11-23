@@ -145,7 +145,6 @@ class HBNBCommand(cmd.Cmd):
                 elif len(argl) == 0:
                     objl.append(obj.__str__())
             print(objl)
-
     def do_count(self, arg):
         """Usage: count <class> or <class>.count()
         Retrieve the number of instances of a given class."""
@@ -155,46 +154,53 @@ class HBNBCommand(cmd.Cmd):
             if argl[0] == obj.__class__.__name__:
                 count += 1
         print(count)
-	
-    def do_create(self, arg):
-
+def do_count(self, arg):
+    """Usage: create <Class name> <param 1> <param 2> <param 3>...
+    Create a new class instance with the given parameters.
+    Param syntax: <key name>=<value>
+    Value syntax:
+    - String: "<value>" => starts with a double quote
+      any double quote inside the value must be escaped with a backslash \
+      all underscores _ must be replaced by spaces.
+    - Float: <unit>.<decimal> => contains a dot .
+    - Integer: <number> => default case
+    If any parameter doesn’t fit these requirements or can’t be recognized correctly
+    by your program, it must be skipped.
+    """
     argl = parse(arg)
     if len(argl) == 0:
         print("** class name missing **")
     elif argl[0] not in HBNBCommand.__classes:
         print("** class doesn't exist **")
     else:
-        # Create an instance of the specified class
+        " Create an instance of the specified class"
         new_instance = eval(argl[0])()
 
-        # Parse parameters and set attributes of the instance
+        " Parse parameters and set attributes of the instance"
         params = argl[1:]
         for param in params:
             key_value = param.split('=')
             if len(key_value) == 2:
                 key, value = key_value[0], key_value[1]
 
-                # Handle string values
+                " Handle string values"
                 if value.startswith('"') and value.endswith('"'):
                     value = value[1:-1].replace("_", " ")
 
-                # Handle float values
                 elif '.' in value:
                     value = float(value)
 
-                # Handle integer values
                 else:
                     try:
                         value = int(value)
                     except ValueError:
-                        print(f"Skipping invalid value: {param}")
+                        print("Skipping invalid value: {}".format(param) )
                         continue
 
                 setattr(new_instance, key, value)
 
         print(new_instance.id)
         storage.save()
-
 
     def do_update(self, arg):
         """Usage: update <class> <id> <attribute_name> <attribute_value> or
